@@ -1,8 +1,13 @@
 import re
+from time import time
 MAILRE=r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 USERNAMERE="^[a-zA-Z0-9_.-]+$"
 PASSRE="^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$"
 PHONERE="^(?:\+20|0)?1[0125]\d{8}$"
+DESSCRIOTION_RE =r"^.{25,}$"
+AMOUNTRE = r"^\d{1,3}(,\d{3})*(\.\d{2})?$"
+DATERE = r"^(\d{4})-(0[1-9]|1[0-2]|[1-9])-([1-9]|0[1-9]|[1-2]\d|3[0-1])$"
+
 
 # validator fun
 def validator(type,value):
@@ -18,11 +23,19 @@ def validator(type,value):
     elif type == "phone":
         if re.fullmatch(PHONERE , value):
             return True
-
+    elif type == "description":
+        if re.fullmatch(DESSCRIOTION_RE , value):
+            return True
+    elif type == "amount" :
+        if re.fullmatch(AMOUNTRE , value):
+            return True
+    elif type== "date" :
+        if re.fullmatch(DATERE , value):
+            return True
 
     return False
 
-
+# start_data
 
 
 def auth_user(email,password):
@@ -36,8 +49,8 @@ def auth_user(email,password):
             return False
         # print(user.split(":")[2],end="\n")
         # print(user.split(":")[3])
-        elif email == user.split(":")[2] and password == user.split(":")[3]:
-            return True
+        elif email == user.split(":")[3] and password == user.split(":")[5]:
+            return user.split(":")[0]
 
     return False
 
@@ -45,7 +58,7 @@ def auth_user(email,password):
 
 def save_user(f_name,l_name , email ,passwrd , phone):
     user_data  = open("users.txt" , "a")
-    user_data.write(f"{f_name}:{l_name}:{email}:{phone}:{passwrd}\n")
+    user_data.write(f"{round(time())}:{f_name}:{l_name}:{email}:{phone}:{passwrd}\n")
     user_data.close()
 
 
@@ -60,9 +73,11 @@ def login():
             break
 
         password = input("Enter your password :")
-        if auth_user(email ,password):
+        user_id =auth_user(email ,password)
+        if user_id :
+
             print("login succefully ")
-            break
+            return user_id
 
 
 
@@ -146,7 +161,6 @@ def signUp():
         save_user(valid_first_name, valid_last_name,valid_email,valid_password ,valid_phone)
         print("signup succefully you can login now  ")
         break
-
 
 
 
